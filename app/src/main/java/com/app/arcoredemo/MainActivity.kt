@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.RawRes
 import androidx.appcompat.app.AppCompatActivity
+import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
+import com.google.ar.sceneform.ux.TransformableNode
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -21,6 +23,23 @@ class MainActivity : AppCompatActivity() {
          * Touch listener to detect when a user touches the ArScene plane to place a model
          */
         arFragment.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
+            loadModel(R.raw.model) { modelRenderable ->
+                //Used to get anchor point on scene where user tapped
+                val anchor = hitResult.createAnchor()
+                //Created an anchor node to attach the anchor with its parent
+                val anchorNode = AnchorNode(anchor)
+                //Added arSceneView as parent to the anchorNode. So our anchors will bind to arSceneView.
+                anchorNode.setParent(arFragment.arSceneView.scene)
+
+                //TransformableNode for out model. So that it can be rotated, scaled etc using gestures
+                val transformableNode = TransformableNode(arFragment.transformationSystem)
+                //Assigned anchorNode as parent so that our model stays at the position where user taps
+                transformableNode.setParent(anchorNode)
+                //Assigned the resulted model received from loadModel method to transformableNode
+                transformableNode.renderable = modelRenderable
+                //Sets this node as selected node by default
+                transformableNode.select()
+            }
         }
     }
 
@@ -32,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             .builder()
             .setSource(this, model)
             .build()
-            .thenAcceptAsync { modelRenderable ->
+            .thenAccept { modelRenderable ->
                 callback(modelRenderable)
             }
     }
