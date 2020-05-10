@@ -24,7 +24,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
 }
 
 dependencies {
@@ -40,3 +46,8 @@ dependencies {
     //ArCore sceneform dependency
     implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.15.0'
 }
+
+sceneform.asset('sampledata/models/model.obj',
+        'default',
+        'sampledata/models/model.sfa',
+        'src/main/res/raw/model')
